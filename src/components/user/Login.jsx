@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Loader from "../layout/Loader";
 import MetaData from "../layout/MetaData";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,14 +9,17 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const { loading, isAuthenticated, error } = useSelector(
     (state) => state.auth
   );
   const navigate = useNavigate();
+  const redirect = location.search ? location.search.split("=")[1] : "/";
+console.log(location.search.split("=")[1]);
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/");
+      navigate(`/${redirect}`);
     }
     if (error) {
       // error toaster

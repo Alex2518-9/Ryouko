@@ -2,16 +2,27 @@ import React, { Fragment } from "react";
 import { Link } from "react-router-dom";
 import "../../App.css";
 import Search from "./Search";
+import { useDispatch, useSelector } from "react-redux";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
+import DropdownButton from "react-bootstrap/DropdownButton";
+import { logout } from "../../actions/userActions";
 
 const Header = () => {
+  const dispatch = useDispatch();
+
+  const { user, loading } = useSelector((state) => state.auth);
+  const { cartItems } = useSelector((state) => state.cart);
+
+  const onLogout = () => {
+    dispatch(logout());
+    // alert.success("Logged out successfully.");
+  };
   return (
     <Fragment>
       <nav className="navbar row">
         <div className="col-12 col-md-3">
           <div className="navbar-brand">
-            <Link to={"/"}>
-              {/* <img src="./images/logo.png" alt="" /> */}
-            </Link>
+            <Link to={"/"}>{/* <img src="./images/logo.png" alt="" /> */}</Link>
           </div>
         </div>
 
@@ -20,16 +31,60 @@ const Header = () => {
         </div>
 
         <div className="col-12 col-md-3 mt-4 mt-md-0 text-center">
-          <Link to={"/login"} className="btn ml-4" id="login_btn">
-            Login
+          <Link to={"/cart"} style={{ textDecoration: "none" }}>
+            <span id="cart" className="ml-3">
+              Cart
+            </span>
+            <span className="ml-1" id="cart_count">
+              {cartItems.length}
+            </span>
           </Link>
 
-          <span id="cart" className="ml-3">
-            Cart
-          </span>
-          <span className="ml-1" id="cart_count">
-            2
-          </span>
+          {user ? (
+            <div className="ml-4 dropdown d-inline">
+              <Link>
+                <figure className="avatar avatar-nav">
+                  <img
+                    src={user.avatar && user.avatar.url}
+                    alt={user && user.name}
+                    className="rounded-circle"
+                  />
+                </figure>
+              </Link>
+
+              <DropdownButton
+                as={ButtonGroup}
+                id={`dropdown-variants-warning`}
+                variant={"warning"}
+                title={user && user.name}
+              >
+                {user && user.role === "admin" && (
+                  <Link className="dropdown-item" to="/dashboard">
+                    Dashboard
+                  </Link>
+                )}
+                <Link className="dropdown-item" to="/orders/me">
+                  Orders
+                </Link>
+                <Link className="dropdown-item" to="/me">
+                  Profile
+                </Link>
+                <Link
+                  className="dropdown-item text-danger"
+                  to="/"
+                  onClick={onLogout}
+                >
+                  Logout
+                </Link>
+              </DropdownButton>
+            </div>
+          ) : (
+            !loading && (
+              <Link to="/login" className="btn ml-4" id="login_btn">
+                Login
+              </Link>
+            )
+          )}
         </div>
       </nav>
     </Fragment>
